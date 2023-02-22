@@ -1,6 +1,8 @@
 ﻿using Dapr.Client;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MyFrontEnd.Models;
+using System.Diagnostics;
+using Dapr.AspNetCore;
 
 namespace MyFrontEnd.Pages
 {
@@ -21,6 +23,7 @@ namespace MyFrontEnd.Pages
                 "MyBackEnd",
                 "weatherforecast");
             ViewData["WeatherForecastData"] = forecasts;
+
         }
     }
 }

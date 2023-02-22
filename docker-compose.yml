@@ -1,32 +1,92 @@
 version: '3.4'
 
+networks:
+  dapr-net:
+  
 services:
   myfrontend:
     image: ${DOCKER_REGISTRY-}myfrontend
     build:
       context: .
       dockerfile: MyFrontEnd/Dockerfile
-    ports:
-      - "51000:50001"
+    depends_on:
+      - dapr-placement
+      - redis
+      - zipkin
+    networks: 
+      - dapr-net
+    environment:
+      - ZIPKIN_BASE_URL=http://zipkin:9411/api/v2/spans
 
   myfrontend-dapr:
     image: "daprio/daprd:latest"
-    command: [ "./daprd", "-app-id", "MyFrontEnd", "-app-port", "80" ]
+    command: [ "./daprd", 
+        "-app-id", "MyFrontEnd", 
+        "-app-port", "80",
+        "-dapr-http-port", "3500",
+        "-log-level", "debug",
+        "-enable-api-logging", "true",
+        "-placement-host-address", "dapr-placement:50000",
+        "-dapr-tracing" ]
     depends_on:
       - myfrontend
     network_mode: "service:myfrontend"
+    environment:
+      - ZIPKIN_ADDRESS=zipkin:9411
 
   mybackend:
     image: ${DOCKER_REGISTRY-}mybackend
     build:
       context: .
       dockerfile: MyBackEnd/Dockerfile
-    ports:
-      - "52000:50001"
+    depends_on:
+      - dapr-placement
+      - redis
+      - zipkin
+    networks: 
+      - dapr-net
+    environment:
+      - ZIPKIN_BASE_URL=http://zipkin:9411/api/v2/spans
 
   mybackend-dapr:
     image: "daprio/daprd:latest"
-    command: [ "./daprd", "-app-id", "MyBackEnd", "-app-port", "80" ]
+    command: [ "./daprd", 
+        "-app-id", "MyBackEnd", 
+        "-app-port", "80",
+        "-dapr-http-port", "3500",
+        "-log-level", "debug",
+        "-enable-api-logging", "true",
+        "-placement-host-address", "dapr-placement:50000",
+        "-dapr-tracing",
+        "-dapr-tracing-exporter", "zipkin" ]
     depends_on:
       - mybackend
     network_mode: "service:mybackend"
+    environment:
+      - ZIPKIN_ADDRESS=zipkin:9411
+
+
+  zipkin:
+    image: openzipkin/zipkin-slim:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - dapr-net
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "5379:6379"
+    networks:
+      - dapr-net
+
+  dapr-placement:
+    image: "daprio/dapr:1.9.4"
+    command: [ "./placement", 
+        "--port", "50000", 
+        "--log-level", "debug" ]
+    ports:
+      - "50000:50000"
+    networks:
+      - dapr-net

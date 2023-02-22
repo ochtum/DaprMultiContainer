@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mybackend
+  labels:
+    app: mybackend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mybackend
+  template:
+    metadata:
+      labels:
+        app: mybackend
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "mybackend"
+        dapr.io/app-port: "9411"
+        dapr.io/log-as-json: "true"
+        dapr.io/enable-api-logging: "true"
