@@ -33,7 +33,7 @@ namespace MyFrontEnd.Pages
 
             var trace2 = zipkin4net.Trace.Create();
             trace2.Record(Annotations.ServerRecv());
-            trace2.Record(Annotations.ServiceName("MyBackEndNew2222222222"));
+            trace2.Record(Annotations.ServiceName("MyBackEndNew"));
             trace2.Record(Annotations.Rpc("GET"));
             trace2.Record(Annotations.Tag("http.url", "test"));
             trace2.Record(Annotations.ServerSend());
