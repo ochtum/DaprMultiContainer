@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="zipkin4net" Version="1.5.0" />
     <PackageReference Include="zipkin4net.middleware.aspnetcore" Version="1.5.0" />
-    <PackageReference Include="zipkin4net.middleware.owin" Version="1.5.0" />
   </ItemGroup>
 
 </Project>

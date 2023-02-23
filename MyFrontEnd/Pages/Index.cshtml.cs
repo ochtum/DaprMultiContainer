@@ -24,6 +24,8 @@ namespace MyFrontEnd.Pages
                 "MyBackEnd",
                 "weatherforecast");
             ViewData["WeatherForecastData"] = forecasts;
+            
+            //ZipkinTrace追加
             var trace = zipkin4net.Trace.Current.Child();
             trace.Record(Annotations.ServerRecv());
             trace.Record(Annotations.ServiceName("MyBackEnd1"));
@@ -31,6 +33,7 @@ namespace MyFrontEnd.Pages
             trace.Record(Annotations.Tag("http.url", "http://zipkin:9411"));
             trace.Record(Annotations.ServerSend());
 
+            //ZipkinTrace新規作成
             var trace2 = zipkin4net.Trace.Create();
             trace2.Record(Annotations.ServerRecv());
             trace2.Record(Annotations.ServiceName("MyBackEndNew"));

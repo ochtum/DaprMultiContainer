@@ -9,6 +9,7 @@ namespace MyFrontEnd.Class
 {
     public static class ZipkinExtension
     {
+        //ZipkinTrace出力
         public static void UserZipkinCore(this IApplicationBuilder app,IHostApplicationLifetime applicationLifetime, ILoggerFactory loggerFactory,string zipkinControllerUrl,string serviceName)
         {
             applicationLifetime.ApplicationStarted.Register(() =>
