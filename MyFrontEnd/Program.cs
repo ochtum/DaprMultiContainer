@@ -9,11 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 //DaprClient
-builder.Services.AddDaprClient();
+builder.Services.AddDaprClient(builder =>
+{
+    builder.UseHttpEndpoint("http://envoygateway:10000");
+});
+//HttpClient
+builder.Services.AddHttpClient();
 //ZipkinTraceƒnƒ“ƒhƒ‰[
 builder.Services.AddHttpClient("Tracer").AddHttpMessageHandler(provider => TracingHandler.WithoutInnerHandler(provider.GetService<IConfiguration>()["applicagtionName"]));
 
 builder.Services.AddRazorPages();
+
+//HttpClient‚ÌBaseUrlÝ’è
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://envoygateway:10000") });
 
 var app = builder.Build();
 

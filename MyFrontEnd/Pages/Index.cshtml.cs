@@ -1,8 +1,6 @@
 ﻿using Dapr.Client;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MyFrontEnd.Models;
-using System.Diagnostics;
-using Dapr.AspNetCore;
 using zipkin4net;
 
 namespace MyFrontEnd.Pages
@@ -10,19 +8,32 @@ namespace MyFrontEnd.Pages
     public class IndexModel : PageModel
     {
         private readonly DaprClient _daprClient;
+        private readonly HttpClient _httpClient;
 
-
-        public IndexModel(DaprClient daprClient)
+        public IndexModel(DaprClient daprClient, HttpClient httpClient)
         {
             _daprClient = daprClient;
+            _httpClient = httpClient;
         }
 
         public async Task OnGet()
         {
-            var forecasts = await _daprClient.InvokeMethodAsync<IEnumerable<WeatherForecast>>(
+            //HttpClient
+            var response = await _httpClient.GetAsync("/weatherforecast");
+            IEnumerable<WeatherForecast> forecasts = null;
+
+            if (response.IsSuccessStatusCode)
+            {
+                forecasts = await response.Content.ReadFromJsonAsync<IEnumerable<WeatherForecast>>();
+            }
+
+            //DaprClient
+            var forecasts2 = await _daprClient.InvokeMethodAsync<IEnumerable<WeatherForecast>>(
                 HttpMethod.Get,
                 "MyBackEnd",
                 "weatherforecast");
+
+            //通常ルートforecastsでも、Daprサイドカールートforecasts2でも、同じ結果が取得できる
             ViewData["WeatherForecastData"] = forecasts;
             
             //ZipkinTrace追加

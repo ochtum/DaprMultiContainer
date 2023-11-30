@@ -65,6 +65,31 @@ services:
     environment:
       - ZIPKIN_ADDRESS=zipkin:9411
 
+  envoygateway:
+    build: Envoy/
+    networks:
+      - dapr-net
+    ports:
+      - "9902:9902"
+      - "10000:10000"
+    volumes:
+      - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
+
+  envoygateway-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", 
+      "-app-id", "EnvoyGateway", 
+      "-app-port", "10000",
+      "-dapr-http-port", "3500",
+      "-log-level", "info",
+      "-enable-api-logging", "true",
+      "-placement-host-address", "dapr-placement:50000",
+      "-dapr-tracing" ]
+    depends_on:
+      - envoygateway
+    network_mode: "service:envoygateway"
+    environment:
+      - ZIPKIN_ADDRESS=zipkin:9411
 
   zipkin:
     image: openzipkin/zipkin-slim:latest
