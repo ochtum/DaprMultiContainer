@@ -3,9 +3,14 @@ using zipkin4net.Transport.Http;
 using zipkin4net;
 using zipkin4net.Tracers.Zipkin;
 using zipkin4net.Middleware;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 // Add services to the container.
 
 //DaprClient

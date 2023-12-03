@@ -92,6 +92,21 @@ services:
     environment:
       - ZIPKIN_ADDRESS=zipkin:9411
 
+  nginx:
+    container_name: nginx
+    image: ${DOCKER_REGISTRY-}nginx
+    build:
+      context: .
+      dockerfile: Nginx/Dockerfile
+    ports:
+      - "8090:80"
+    networks:
+      - dapr-net
+    depends_on:
+      - myfrontend
+    volumes:
+      - "./Nginx/nginx.conf:/etc/nginx/nginx.conf"
+
   zipkin:
     image: openzipkin/zipkin-slim:latest
     container_name: zipkin
